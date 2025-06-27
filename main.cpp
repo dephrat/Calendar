@@ -182,9 +182,13 @@ unsigned int num_leap_years(const unsigned int end, const unsigned int start) {
 const auto point1 = std::chrono::steady_clock::now();
     //start inclusive to end exclusive
     if (start > end) return 0;
-    const auto point2 = std::chrono::steady_clock::now();
-    int num_leap_years = 0;
 
+    const auto point2 = std::chrono::steady_clock::now();
+
+    int num_leap_years = 0;
+    
+    //New: FASTER!!!
+    
     //find first year divisible by 4 at or past the starting year
     int y = start;
     while (y < end && y % 4/*!is_leap_year(y)*/) {
@@ -194,6 +198,7 @@ const auto point1 = std::chrono::steady_clock::now();
     for (; y < end; y += 4) {
         num_leap_years += is_leap_year(y);
     }
+    
     const auto point3 = std::chrono::steady_clock::now();
     //one improvement is to find the first leap year >= start, then loop by y += 4 instead of ++y
     //another improvement is to sum how many div4 there are, then subtract how many div100,
