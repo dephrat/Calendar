@@ -93,9 +93,7 @@ int main() {
         else if (user_date == current) cout << " is ";
         else cout << " will be ";
         cout << day_map[calendar(year, month, date)] << "." << endl << endl;
-        for (int i = 0; i < 1000000; ++i) {
-            calendar(year, month, date);
-        }
+       
     }
 
 }
