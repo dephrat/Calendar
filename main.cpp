@@ -2,6 +2,7 @@
 
 //structure: main writes a shell to gather info and validate, then pass it to the calendar function.
 
+#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <sstream>
@@ -26,6 +27,10 @@ const unordered_map<string, int> month_day_map = {{"January", 0}, {"February", 1
     {"June", 5}, {"July", 6}, {"August", 7}, {"September", 8}, {"October", 9}, {"November", 10}, {"December", 11}};
 
 const vector<int> month_days = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+std::chrono::duration<double> diff1 = std::chrono::duration<double>::zero();
+std::chrono::duration<double> diff2 = diff1;
+std::chrono::duration<double> diff3 = diff1;
 
 int main() {
     unsigned int year, month, date;
@@ -92,7 +97,19 @@ int main() {
         if (user_date < current) cout << " was ";
         else if (user_date == current) cout << " is ";
         else cout << " will be ";
-        cout << day_map[calendar(year, month, date)] << "." << endl << endl;
+
+        cout << day_map[calendar(year, month, date)] << "." << endl;
+        for (int i = 0; i < 1000000; ++i) {
+            calendar(year, month, date);
+        }
+    
+        auto millis1 = std::chrono::duration_cast<std::chrono::milliseconds>(diff1).count();
+        auto millis2 = std::chrono::duration_cast<std::chrono::milliseconds>(diff2).count();
+        auto millis3 = std::chrono::duration_cast<std::chrono::milliseconds>(diff3).count();
+        cout << millis1 << " " << millis2 << " " << millis3 << endl << endl;
+        diff1 = std::chrono::duration<double>::zero();
+        diff2 = diff1;
+        diff3 = diff1;
        
     }
 
@@ -100,6 +117,7 @@ int main() {
 
 unsigned int calendar(const unsigned int year, const unsigned int month, const unsigned int date) {
 
+    
 //get jan 1 in the desired year
 int num_days_added = 365 * year; //does this fit inside int?
 // the number of days we have to add is limited by the size of the year datatype
@@ -113,7 +131,10 @@ int num_leap_year_days = num_leap_years(year); //num_leap_years goes from 0 incl
 // num_leap_years counts number of leap days from jan1 of start to jan1 of end. if start == end, then
 // num leap days is 0.
 
+
 num_days_added += num_leap_year_days;
+
+    
 
 int jan_1_year = (jan_1_0000 + num_days_added) % 7;
 
@@ -127,11 +148,15 @@ num_days_added += (month > 1 && is_leap_year(year)); // if it's past february an
 
 int month_1_year = (jan_1_year + num_days_added) % 7;
 
+    
+
 //now for days.
 
 num_days_added = date - 1;
 
 int month_date_year = (month_1_year + num_days_added) % 7;
+
+
 
 return month_date_year;
 
@@ -152,19 +177,36 @@ bool is_leap_year(unsigned int year) {
     if (year % 100) return true;
     if (year % 400) return false;
     return true;
+
 }
 
 unsigned int num_leap_years(const unsigned int end, const unsigned int start) {
+const auto point1 = std::chrono::steady_clock::now();
     //start inclusive to end exclusive
     if (start > end) return 0;
-    
+
+    const auto point2 = std::chrono::steady_clock::now();
+
     int num_leap_years = 0;
-    for (int y = start; y < end; ++y) {
+    
+    //New: FASTER!!!
+    
+    //find first year divisible by 4 at or past the starting year
+    int y = start;
+    while (y < end && y % 4/*!is_leap_year(y)*/) {
+        y++;
+    }
+    //now we check every 4 years instead of every year
+    for (; y < end; y += 4) {
         num_leap_years += is_leap_year(y);
     }
+    
+    const auto point3 = std::chrono::steady_clock::now();
     //one improvement is to find the first leap year >= start, then loop by y += 4 instead of ++y
     //another improvement is to sum how many div4 there are, then subtract how many div100,
     // then add how many div400
+    diff1 += point2-point1;
+    diff2 += point3-point2;
 
     return num_leap_years;
 }
