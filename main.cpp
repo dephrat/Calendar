@@ -97,6 +97,7 @@ int main() {
         if (user_date < current) cout << " was ";
         else if (user_date == current) cout << " is ";
         else cout << " will be ";
+
         cout << day_map[calendar(year, month, date)] << "." << endl;
         for (int i = 0; i < 1000000; ++i) {
             calendar(year, month, date);
@@ -109,6 +110,7 @@ int main() {
         diff1 = std::chrono::duration<double>::zero();
         diff2 = diff1;
         diff3 = diff1;
+       
     }
 
 }
